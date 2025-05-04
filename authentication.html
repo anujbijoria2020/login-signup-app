@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Signup/Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 300px;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      display: none;
+    }
+
+    .box.active {
+      display: block;
+    }
+
+    .input-group {
+      margin: 10px 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .toggle-links {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .toggle-links a {
+      cursor: pointer;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .toggle-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 id="title">Login</h2>
+
+    <!-- Login -->
+    <div id="login-box" class="box active">
+      <div class="input-group">
+        <input type="text" id="login-username" placeholder="Username">
+      </div>
+      <div class="input-group">
+        <input type="password" id="login-password" placeholder="Password">
+      </div>
+      <button onclick="loginUser()">Login</button>
+    </div>
+
+    <!-- Signup -->
+    <div id="signup-box" class="box">
+      <div class="input-group">
+        <input type="text" id="signup-username" placeholder="Username">
+      </div>
+      <div class="input-group">
+        <input type="password" id="signup-password" placeholder="Password">
+      </div>
+      <div class="input-group">
+        <input type="text" id="signup-name" placeholder="First Name">
+      </div>
+      <div class="input-group">
+        <input type="text" id="signup-lastname" placeholder="Last Name">
+      </div>
+      <button onclick="signupUser()">Signup</button>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="toggle-links">
+      <a onclick="showBox('login')">Login</a> |
+      <a onclick="showBox('signup')">Signup</a>
+    </div>
+  </div>
+
+  <script>
+    const loginBox = document.getElementById('login-box');
+    const signupBox = document.getElementById('signup-box');
+    const title = document.getElementById('title');
+
+
+
+
+    function showBox(box) {
+      loginBox.classList.remove('active');
+      signupBox.classList.remove('active');
+
+      if (box === 'login') {
+        loginBox.classList.add('active');
+        title.textContent = 'Login';
+      } else if (box === 'signup') {
+        signupBox.classList.add('active');
+        title.textContent = 'Signup';
+      }
+    }
+
+  
+
+    function signupUser() {
+  const username = document.getElementById("signup-username").value;
+  const password = document.getElementById("signup-password").value;
+  const name = document.getElementById("signup-name").value;
+  const lastname = document.getElementById("signup-lastname").value;
+
+  fetch('http://localhost:3000/signup', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      username,
+      password,
+      name,
+      lastname
+    })
+  })
+  .then((res) => {
+    return res.text(); // since your backend sends plain text
+  })
+  .then((data) => {
+    alert(data); // shows "signup completed"
+  })
+  .catch((err) => {
+    alert("Error: " + err.message);
+  });
+}
+
+function loginUser() {
+  const username = document.getElementById("login-username").value;
+  const password = document.getElementById("login-password").value;
+
+  fetch('http://localhost:3000/login', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ username, password })
+  })
+  .then((res) => {
+    if (!res.ok) {
+      return res.text().then(text => { throw new Error(text); });
+    }
+    return res.json();
+  })
+  .then((data) => {
+    console.log("Login successful:", data);
+    alert(`Welcome ${data.firstName} ${data.lastName}`);
+  })
+  .catch((err) => {
+    console.error("Login failed:", err.message);
+    alert("Login failed: " + err.message);
+  });
+}
+
+  </script>
+
+</body>
+</html>
